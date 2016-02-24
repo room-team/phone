@@ -417,10 +417,22 @@
 		var value = sensortag.getLuxometerValue(data)
 
 		// Prepare the information to display.
-		string =
+		string = ''
 			//'raw: <span style="font-family: monospace;">0x' +
 			//	bufferToHexStr(data, 0, 2) + '</span><br/>' +
 			'Light level: ' + value.toPrecision(5) + ' lux<br/>'
+		
+		if(value < 5){
+			string = 'Lights off'
+		} else if (value < 75){
+			string = 'Projector on'
+		} else if (value < 100){
+			string = 'Lights dim'
+		} else {
+			string = 'Lights on'
+		}
+		
+		string += ' (' + value.toPrecision(5) + ' lux)<br/>'
 
 		// Update the value displayed.
 		displayValue('LuxometerData', string)
