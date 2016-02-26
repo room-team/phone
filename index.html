@@ -87,6 +87,12 @@
 	</p>
 
 	<h2>Magnetometer:</h2>
+	<button onclick="calibrateClosed()" class="charcoal">
+		Calibrate Closed
+	</button>
+	<button onclick="calibrateOpen()" class="charcoal">
+		Calibrate Open
+	</button>
 	<p>
 		<span id="MagnetometerData">[Waiting for value]</span>
 	</p>
@@ -364,16 +370,38 @@
 		//var model = sensortag.getDeviceModel()
 		//var dataOffset = (model == 2 ? 12 : 0)
 
+		
+		
 		// Prepare the information to display.
 		string =
 			//'raw: <span style="font-family: monospace;">0x' +
 			//	bufferToHexStr(data, dataOffset, 6) + '</span><br/>' +
-			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + '&micro;T <br/>' +
-			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + '&micro;T <br/>' +
-			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '&micro;T <br/>'
+			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + '&micro;T (' + sensortag.magClosedX + ', ' + sensortag.magOpenX + ')<br/>' +
+			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + '&micro;T (' + sensortag.magClosedY + ', ' + sensortag.magOpenY + ')<br/>' +
+			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '&micro;T (' + sensortag.magClosedZ + ', ' + sensortag.magOpenZ + ')<br/>'
 
 		// Update the value displayed.
 		displayValue('MagnetometerData', string)
+	}
+	
+	function calibrateClosed(){
+		var values = sensortag.getMagnetometerValues(data)
+		var x = values.x
+		var y = values.y
+		var z = values.z
+		sensortag.magClosedX = 5
+		sensortag.magClosedY = y
+		sensortag.magClosedZ = z
+	}
+	
+	function calibrateOpen(){
+		var values = sensortag.getMagnetometerValues(data)
+		var x = values.x
+		var y = values.y
+		var z = values.z
+		sensortag.magOpenX = x
+		sensortag.magOpenY = y
+		sensortag.magOpenZ = z
 	}
 
 	function barometerHandler(data)
@@ -424,9 +452,9 @@
 		
 		if(value < 5){
 			string = 'Lights off'
-		} else if (value < 75){
+		} else if (value < 15){
 			string = 'Projector on'
-		} else if (value < 100){
+		} else if (value < 50){
 			string = 'Lights dim'
 		} else {
 			string = 'Lights on'
