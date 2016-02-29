@@ -366,6 +366,7 @@
 		var x = values.x
 		var y = values.y
 		var z = values.z
+		sensortag.lastMagData = values
 
 		//var model = sensortag.getDeviceModel()
 		//var dataOffset = (model == 2 ? 12 : 0)
@@ -385,17 +386,17 @@
 	}
 	
 	function calibrateClosed(){
-		var values = sensortag.getMagnetometerValues(data)
+		var values = sensortag.lastMagData;
 		var x = values.x
 		var y = values.y
 		var z = values.z
-		sensortag.magClosedX = 5
+		sensortag.magClosedX = x
 		sensortag.magClosedY = y
 		sensortag.magClosedZ = z
 	}
 	
 	function calibrateOpen(){
-		var values = sensortag.getMagnetometerValues(data)
+		var values = sensortag.lastMagData
 		var x = values.x
 		var y = values.y
 		var z = values.z
