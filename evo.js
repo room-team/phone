@@ -1,130 +1,4 @@
-<!DOCTYPE html>
-<!--
-	Demonstration of the TI SensorTag JavaScript library.
--->
-<html>
 
-<head>
-	<meta charset="utf-8" />
-	<meta name="format-detection" content="telephone=no" />
-	<meta name="viewport" content="width=device-width, user-scalable=no,
-		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
-
-	<title>Team Room Tracker</title>
-
-	<style>
-		@import 'ui/css/evothings-app.css';
-	</style>
-
-	<script>
-	// Redirect console.log to Evothings Workbench.
-	if (window.hyper && window.hyper.log) { console.log = hyper.log }
-	</script>
-
-	<script src="cordova.js"></script>
-	<script src="evo.js"></script>
-	<script src="libs/evothings/evothings.js"></script>
-	<script src="libs/evothings/ui/ui.js"></script>
-	<script src="libs/evothings/tisensortag/tisensortag.js"></script>
-</head>
-
-<body>
-
-	<header>
-		<button class="back" onclick="history.back()">
-			<img src="ui/images/arrow-left.svg" />
-		</button>
-		<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
-		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
-	</header>
-
-	<h1>TI SensorTag CC2650 &amp; CC2541 Sensors</h1>
-
-	<img src="TISensorTagCC2650.png"
-		style="float:right;width:120px;height:auto;"/>
-
-	<p>
-		This example works with the <strong>TI SensorTag CC2650</strong>. It also works with the TI SensorTag CC2541 if you modify file index.html. Activate the SensorTag and press Connect to begin.
-	</p>
-
-	<p id="upgradeNotice" class="hidden">
-		<span class="color_softred">Please upgrade the firmware of your SensorTag.</span>
-	</p>
-
-	<button onclick="connect()" class="green">
-		Connect
-	</button>
-
-	<button onclick="disconnect()" class="charcoal">
-		Disconnect
-	</button>
-
-	<p>
-		<strong>Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
-	</p>
-
-	<p>
-		<button onclick="toggleSensors()" class="charcoal">Toggle sensors</button>
-	</p>
-
-	<h2>Keypress:</h2>
-	<p>
-		<span id="KeypressData">[Waiting for value]</span>
-	</p>
-
-	<h2>Temperature:</h2>
-	<p>
-		<span id="TemperatureData">[Waiting for value]</span>
-	</p>
-
-	<h2>Accelerometer:</h2>
-	<p>
-		<span id="AccelerometerData">[Waiting for value]</span>
-	</p>
-
-	<h2>Humidity:</h2>
-	<p>
-		<span id="HumidityData">[Waiting for value]</span>
-	</p>
-
-	<h2>Magnetometer:</h2>
-	<button onclick="calibrateClosed()" class="charcoal">
-		Calibrate Closed
-	</button>
-	<button onclick="calibrateOpen()" class="charcoal">
-		Calibrate Open
-	</button>
-	<button onclick="calibrateHalf()" class="charcoal">
-		Calibrate Halfway Open
-	</button>
-	<p>
-		<span id="MagnetometerData">[Waiting for value]</span>
-	</p>
-
-	<h2>Barometer:</h2>
-	<p>
-		<span id="BarometerData">[Waiting for value]</span>
-	</p>
-
-	<h2>Gyroscope:</h2>
-	<p>
-		<span id="GyroscopeData">[Waiting for value]</span>
-	</p>
-
-	<div id="Luxometer">
-		<h2>Luxometer:</h2>
-		<p>
-			<span id="LuxometerData">[Waiting for value]</span>
-		</p>
-	</div>
-
-	<h2>Device info:</h2>
-	<p>
-		SensorTag device model: <span id="DeviceModel">?</span><br />
-		Firmware version: <span id="FirmwareData">?</span>
-	</p>
-
-	<script>
 	// SensorTag object.
 	var sensortag
 	var capturedData = {
@@ -163,12 +37,12 @@
 			.gyroscopeCallback(gyroscopeHandler, 1000)
 			.luxometerCallback(luxometerHandler, 1000)
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////////////////THIS IS MY OWN COOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODE
 	var whatever = {
 		this: "thasef"
 	}
-
+	
 	function getNum(){
 		document.getElementById("customButton").innerHTML = whatever.this;
 	}
@@ -383,31 +257,28 @@
 		var x = values.x
 		var y = values.y
 		var z = values.z
-		sensortag.lastMagData = values
 
 		//var model = sensortag.getDeviceModel()
 		//var dataOffset = (model == 2 ? 12 : 0)
 
-		
-		
 		// Prepare the information to display.
 		string =
 			//'raw: <span style="font-family: monospace;">0x' +
 			//	bufferToHexStr(data, dataOffset, 6) + '</span><br/>' +
-			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedX + ', ' + 
+			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedX + ', ' +
 			sensortag.magHalfX + ', ' +
 			sensortag.magOpenX + ')<br/>' +
-			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedY + ', ' + 
+			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedY + ', ' +
 			sensortag.magHalfY + ', ' +
 			sensortag.magOpenY + ')<br/>' +
-			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedZ + ', ' + 
+			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedZ + ', ' +
 			sensortag.magHalfZ + ', ' +
 			sensortag.magOpenZ + ')<br/>'
-			
+
 		var distClosed = Math.abs(x - sensortag.magClosedX) + Math.abs(y - sensortag.magClosedY) + Math.abs(z - sensortag.magClosedZ);
 		var distHalf = Math.abs(x - sensortag.magHalfX) + Math.abs(y - sensortag.magHalfY) + Math.abs(z - sensortag.magHalfZ);
 		var distOpen = Math.abs(x - sensortag.magOpenX) + Math.abs(y - sensortag.magOpenY) + Math.abs(z - sensortag.magOpenZ);
-		
+
 		if(distClosed < distHalf && distClosed < distOpen){
 			string += 'We are closed';
 		} else if (distOpen < distHalf && distOpen < distClosed){
@@ -421,7 +292,7 @@
 		// Update the value displayed.
 		displayValue('MagnetometerData', string)
 	}
-	
+
 	function calibrateClosed(){
 		var values = sensortag.lastMagData;
 		var x = values.x
@@ -431,7 +302,7 @@
 		sensortag.magClosedY = y
 		sensortag.magClosedZ = z
 	}
-	
+
 	function calibrateOpen(){
 		var values = sensortag.lastMagData
 		var x = values.x
@@ -441,7 +312,7 @@
 		sensortag.magOpenY = y
 		sensortag.magOpenZ = z
 	}
-	
+
 	function calibrateHalf(){
 		var values = sensortag.lastMagData
 		var x = values.x
@@ -486,6 +357,7 @@
 
 		// Update the value displayed.
 		displayValue('GyroscopeData', string)
+		
 	}
 
 	function luxometerHandler(data)
@@ -497,7 +369,7 @@
 			//'raw: <span style="font-family: monospace;">0x' +
 			//	bufferToHexStr(data, 0, 2) + '</span><br/>' +
 			'Light level: ' + value.toPrecision(5) + ' lux<br/>'
-		
+
 		if(value < 5){
 			string = 'Lights off'
 		} else if (value < 15){
@@ -561,8 +433,3 @@
 		'deviceready',
 		function() { evothings.scriptsLoaded(initialiseSensorTag) },
 		false)
-	</script>
-
-</body>
-
-</html>
