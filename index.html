@@ -93,6 +93,9 @@
 	<button onclick="calibrateOpen()" class="charcoal">
 		Calibrate Open
 	</button>
+	<button onclick="calibrateHalf()" class="charcoal">
+		Calibrate Halfway Open
+	</button>
 	<p>
 		<span id="MagnetometerData">[Waiting for value]</span>
 	</p>
@@ -377,9 +380,29 @@
 		string =
 			//'raw: <span style="font-family: monospace;">0x' +
 			//	bufferToHexStr(data, dataOffset, 6) + '</span><br/>' +
-			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + '&micro;T (' + sensortag.magClosedX + ', ' + sensortag.magOpenX + ')<br/>' +
-			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + '&micro;T (' + sensortag.magClosedY + ', ' + sensortag.magOpenY + ')<br/>' +
-			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '&micro;T (' + sensortag.magClosedZ + ', ' + sensortag.magOpenZ + ')<br/>'
+			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedX + ', ' + 
+			sensortag.magHalfX + ', ' +
+			sensortag.magOpenX + ')<br/>' +
+			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedY + ', ' + 
+			sensortag.magHalfY + ', ' +
+			sensortag.magOpenY + ')<br/>' +
+			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedZ + ', ' + 
+			sensortag.magHalfZ + ', ' +
+			sensortag.magOpenZ + ')<br/>'
+			
+		var distClosed = Math.abs(x - sensortag.magClosedX) + Math.abs(y - sensortag.magClosedY) + Math.abs(z - sensortag.magClosedZ);
+		var distHalf = Math.abs(x - sensortag.magHalfX) + Math.abs(y - sensortag.magHalfY) + Math.abs(z - sensortag.magHalfZ);
+		var distOpen = Math.abs(x - sensortag.magOpenX) + Math.abs(y - sensortag.magOpenY) + Math.abs(z - sensortag.magOpenZ);
+		
+		if(distClosed < distHalf && distClosed < distOpen){
+			string += 'We are closed';
+		} else if (distOpen < distHalf && distOpen < distClosed){
+			string += 'We are open';
+		} else if (distHalf < distOpen && distHalf < distClosed){
+			string += 'We are half open';
+		} else {
+			string += 'We are not sure';
+		}
 
 		// Update the value displayed.
 		displayValue('MagnetometerData', string)
@@ -403,6 +426,16 @@
 		sensortag.magOpenX = x
 		sensortag.magOpenY = y
 		sensortag.magOpenZ = z
+	}
+	
+	function calibrateHalf(){
+		var values = sensortag.lastMagData
+		var x = values.x
+		var y = values.y
+		var z = values.z
+		sensortag.magHalfX = x
+		sensortag.magHalfY = y
+		sensortag.magHalfZ = z
 	}
 
 	function barometerHandler(data)
