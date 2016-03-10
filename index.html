@@ -59,9 +59,11 @@
 	</button>
 
 	<p>
-		<strong>Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
+		<strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
 	</p>
-
+	
+	<p>
+		<strong>Room Status:</strong> <span id="RoomStatus">No data yet</span>
 	<p>
 		<button onclick="toggleSensors()" class="charcoal">Toggle sensors</button>
 	</p>
@@ -407,17 +409,24 @@
 			var distOpen = Math.abs(x - sensortag.magOpenX) + Math.abs(y - sensortag.magOpenY) + Math.abs(z - sensortag.magOpenZ);
 			
 			if(distClosed < distHalf && distClosed < distOpen){
+				sensortag.doorStatus = 0;
 				string += 'We are closed';
 			} else if (distOpen < distHalf && distOpen < distClosed){
+				sensortag.doorStatus = 5;
 				string += 'We are open';
 			} else if (distHalf < distOpen && distHalf < distClosed){
+				sensortag.doorStatus = 3;
 				string += 'We are half open';
 			} else {
+				sensortag.doorStatus = 1;
 				string += 'We are not sure';
 			}
 			
 			// Update the value displayed.
 			displayValue('MagnetometerData', string)
+			
+			//this is just here because it needs to be called regularly
+			updateRoomStatus();
 		}
 		
 		function calibrateClosed(){
@@ -498,12 +507,16 @@
 			'Light level: ' + value.toPrecision(5) + ' lux<br/>'
 			
 			if(value < 5){
+				sensortag.lightStatus = 5;	//statuses are probablity (or score) that the room is empty
 				string = 'Lights off'
 			} else if (value < 15){
+				sensortag.lightStatus = 2;
 				string = 'Projector on'
 			} else if (value < 50){
+				sensortag.lightStatus = 1;
 				string = 'Lights dim'
 			} else {
+				sensortag.lightStatus = 1;
 				string = 'Lights on'
 			}
 			
@@ -561,6 +574,23 @@
 				function() { evothings.scriptsLoaded(initialiseSensorTag) },
 				false)
 				
+		function updateRoomStatus(){
+			var score = sensortag.lightStatus + sensortag.doorStatus;
+			
+			var status = 'Room is ';
+			
+			if(score > 7){
+				status += 'empty';
+			} else if (score > 3){
+				status += 'unsure';
+			} else {
+				status += 'occupied';
+			}
+			
+			status += ' (' + score + ')';
+			
+			displayValue("RoomStatus", status);
+		}
 	</script>
 	
 </body>
