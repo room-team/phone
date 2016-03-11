@@ -37,18 +37,10 @@
 		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
 	</header>
 
-	<h1>TI SensorTag CC2650 &amp; CC2541 Sensors</h1>
+	<h1>Team Room Availablity Tracker</h1>
 
 	<img src="TISensorTagCC2650.png"
 		style="float:right;width:120px;height:auto;"/>
-
-	<p>
-		This example works with the <strong>TI SensorTag CC2650</strong>. It also works with the TI SensorTag CC2541 if you modify file index.html. Activate the SensorTag and press Connect to begin.
-	</p>
-
-	<p id="upgradeNotice" class="hidden">
-		<span class="color_softred">Please upgrade the firmware of your SensorTag.</span>
-	</p>
 
 	<button onclick="connect()" class="green">
 		Connect
@@ -57,10 +49,22 @@
 	<button onclick="disconnect()" class="charcoal">
 		Disconnect
 	</button>
+	<span>
+		<button id="CalibrateMe" class="charcoal">
+			Calibrate Me
+		</button>
 
-	<p>
+		<button onclick="calibrateClosed()" class="charcoal">
+			Calibrate Closed
+		</button>
+		<button onclick="calibrateOpen()" class="charcoal">
+			Calibrate Open
+		</button>
+		<button onclick="calibrateHalf()" class="charcoal">
+			Calibrate Halfway Open
+		</button></br>
 		<strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
-	</p>
+	</span>
 	
 	<p>
 		<strong>Room Status:</strong> <span id="RoomStatus">No data yet</span>
@@ -72,6 +76,7 @@
 	<p>
 		<span id="KeypressData">[Waiting for value]</span>
 	</p>-->
+
 
 	<h2>Temperature:</h2>
 	<p>
@@ -89,15 +94,7 @@
 	</p>-->
 
 	<h2>Magnetometer:</h2>
-	<button onclick="calibrateClosed()" class="charcoal">
-		Calibrate Closed
-	</button>
-	<button onclick="calibrateOpen()" class="charcoal">
-		Calibrate Open
-	</button>
-	<button onclick="calibrateHalf()" class="charcoal">
-		Calibrate Halfway Open
-	</button>
+
 	<p>
 		<span id="MagnetometerData">[Waiting for value]</span>
 	</p>
@@ -130,8 +127,14 @@
 		// SensorTag object.
 		var sensortag
 		var capturedData = {
-			magnetX: ''
+			magnetX: 0,
+			magnetY: 0,
+			magnetZ: 0
+			
 		}
+
+		var calibrateMeButton = document.getElementById("CalibrateMe")
+		
 		
 		function initialiseSensorTag()
 		{
