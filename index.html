@@ -54,7 +54,8 @@
 			Calibrate Me
 		</button>
 
-		<button onclick="calibrateClosed()" class="charcoal">
+		<button id="calibrateClosed" hidden="calibratingBools.calibratingDoorClosed" onclick="calibrateClosed()"
+				class="charcoal">
 			Calibrate Closed
 		</button>
 		<button onclick="calibrateOpen()" class="charcoal">
@@ -134,7 +135,7 @@
 		}
 
 		var calibrateMeButton = document.getElementById("CalibrateMe")
-		
+
 		
 		function initialiseSensorTag()
 		{
@@ -380,7 +381,28 @@
 			// Update the value displayed.
 			displayValue('HumidityData', string)
 		}
-		
+
+		calibratingBools = {
+			calibratingDoorClosed: false,
+			calibratingDoorHalf: false,
+			calibratingDoorOpen: false,
+			calibratingLightOff: false,
+			calibratingLightOn: false,
+			calibratingLightDim: false,
+			calibratingProjectorOn: false
+		};
+
+		function setCalibratingProperty(property) {
+			for (prop in Object.keys(calibratingBools)) {
+				if (prop === property) {
+					calibratingBools[prop] = true;
+				} else {
+					calibratingBools[prop] = false;
+				}
+			}
+		}
+
+
 		function magnetometerHandler(data)
 		{
 			// Calculate the magnetometer values from raw sensor data.
@@ -410,7 +432,7 @@
 			var distClosed = Math.abs(x - sensortag.magClosedX) + Math.abs(y - sensortag.magClosedY) + Math.abs(z - sensortag.magClosedZ);
 			var distHalf = Math.abs(x - sensortag.magHalfX) + Math.abs(y - sensortag.magHalfY) + Math.abs(z - sensortag.magHalfZ);
 			var distOpen = Math.abs(x - sensortag.magOpenX) + Math.abs(y - sensortag.magOpenY) + Math.abs(z - sensortag.magOpenZ);
-			
+
 			if(distClosed < distHalf && distClosed < distOpen){
 				sensortag.doorStatus = 0;
 				string += 'We are closed';
@@ -433,6 +455,7 @@
 		}
 		
 		function calibrateClosed(){
+			setCalibratingProperty("calibratingClosed")
 			var values = sensortag.lastMagData;
 			var x = values.x
 			var y = values.y
@@ -450,6 +473,8 @@
 			sensortag.magOpenX = x
 			sensortag.magOpenY = y
 			sensortag.magOpenZ = z
+			calibratingDoorOpen = true;
+			setCalibratingProperty("calibratingOpen")
 		}
 		
 		function calibrateHalf(){
@@ -460,6 +485,7 @@
 			sensortag.magHalfX = x
 			sensortag.magHalfY = y
 			sensortag.magHalfZ = z
+			setCalibratingProperty("calibratingHalf")
 		}
 		
 		function barometerHandler(data)
