@@ -25,6 +25,7 @@
 	<script src="libs/evothings/evothings.js"></script>
 	<script src="libs/evothings/ui/ui.js"></script>
 	<script src="libs/evothings/tisensortag/tisensortag.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
 </head>
 
 <body>
@@ -183,6 +184,14 @@
 		function connect()
 		{
 			sensortag.connectToNearestDevice()
+			
+			//validate that we connected to the tag successfully
+			//if(sensortag.getDeviceModel() != 
+			
+			//get the room id
+			
+			//tell the server that we have a new tag
+			
 		}
 		
 		function disconnect()
@@ -606,19 +615,31 @@
 		function updateRoomStatus(){
 			var score = sensortag.lightStatus + sensortag.doorStatus;
 			
-			var status = 'Room is ';
+			var statusString = 'Room is ';
+			var roomStatus = '';
 			
 			if(score > 7){
-				status += 'empty';
+				roomStatus += 'empty';
 			} else if (score > 3){
-				status += 'unsure';
+				roomStatus += 'unsure';
 			} else {
-				status += 'occupied';
+				roomStatus += 'occupied';
 			}
 			
-			status += ' (' + score + ')';
 			
-			displayValue("RoomStatus", status);
+			statusString += roomStatus + ' (' + score + ')';
+			
+			displayValue("RoomStatus", statusString);
+			
+			//push to server (only if status has changed)
+			//if(sensortag.roomStatus != roomStatus){
+			//	//push to server (TODO: this hasn't been tested yet)
+			//	var data = {"status": roomStatus};
+			//	$.post("http://roomteam.me/room_status/", JSON.stringify(data), null, "json");
+			//	
+			//	//update current status
+			//	sensortag.roomStatus = roomStatus;
+			//}
 		}
 	</script>
 	
