@@ -183,6 +183,14 @@
 		function connect()
 		{
 			sensortag.connectToNearestDevice()
+			
+			//validate that we connected to the tag successfully
+			//if(sensortag.getDeviceModel() != 
+			
+			//get the room id
+			
+			//tell the server that we have a new tag
+			
 		}
 		
 		function disconnect()
@@ -598,14 +606,14 @@
 			displayValue("RoomStatus", statusString);
 			
 			//push to server (only if status has changed)
-			if(sensortag.roomStatus != roomStatus){
-				//push to server (TODO: this hasn't been tested yet)
-				var data = {"status": roomStatus};
-				$.post("http://roomteam.me/room_status/", JSON.stringify(data), null, "json");
-				
-				//update current status
-				sensortag.roomStatus = roomStatus;
-			}
+			//if(sensortag.roomStatus != roomStatus){
+			//	//push to server (TODO: this hasn't been tested yet)
+			//	var data = {"status": roomStatus};
+			//	$.post("http://roomteam.me/room_status/", JSON.stringify(data), null, "json");
+			//	
+			//	//update current status
+			//	sensortag.roomStatus = roomStatus;
+			//}
 		}
 	</script>
 	
