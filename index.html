@@ -43,6 +43,8 @@
 	<img src="TISensorTagCC2650.png"
 		style="float:right;width:120px;height:auto;"/>
 
+	Room Number: <textarea id="roomNum" rows="1" cols="5" maxlength="4"></textarea>
+	
 	<button onclick="connect()" class="green">
 		Connect
 	</button>
@@ -69,7 +71,7 @@
 	</span>
 	
 	<p>
-		<strong>Room Status:</strong> <span id="RoomStatus">No data yet</span>
+		<strong>Room Status:</strong> <span id="RoomStatus">No tag connected yet</span>
 	<p>
 		<button onclick="toggleSensors()" class="charcoal">Toggle sensors</button>
 	</p>
@@ -185,13 +187,30 @@
 		{
 			sensortag.connectToNearestDevice()
 			
-			//validate that we connected to the tag successfully
-			//if(sensortag.getDeviceModel() != 
+			//TODO: validate that we connected to the correct tag
+			//This is not currently being implemented because we
+			//are assuming that we'll only be setting up one room 
+			//at a time. (And we can't think of a good way to do it)
 			
-			//get the room id
-			
-			//tell the server that we have a new tag
-			
+			//don't talk to the server unless we connected successfully
+			if ('CC2541' == sensortag.getDeviceModel()){
+				//get the room id
+				var roomNum = document.getElementById("roomNum").value;
+				//make sure they entered a room number
+				if(roomNum != ''){
+					//TODO: tell the server that we have a new tag
+					//var data = {"room_id": roomNum};
+					//$.post("http://roomteam.me/add_sensor/", JSON.stringify(data), null, "json");
+				} else {
+					//alert user that they need to enter a room num
+					displayValue('RoomStatus', "Unable to register: Please enter a room number.")
+				}
+				
+				//TODO: check response from server that it registered correctly?
+			} else {
+				//alert the user that it didn't work
+				displayValue('RoomStatus', "Connection to tag failed.")
+			}
 		}
 		
 		function disconnect()
