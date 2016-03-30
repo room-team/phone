@@ -44,7 +44,7 @@
 		style="float:right;width:120px;height:auto;"/>
 
 	Room Number: <textarea id="roomNum" rows="1" cols="5" maxlength="4"></textarea>
-	
+
 	<button onclick="connect()" class="green">
 		Connect
 	</button>
@@ -69,7 +69,7 @@
 		</button></br>
 		<strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
 	</span>
-	
+
 	<p>
 		<strong>Room Status:</strong> <span id="RoomStatus">No tag connected yet</span>
 	<p>
@@ -127,29 +127,29 @@
 	</p>
 
 	<script>
-		
+
 		// SensorTag object.
 		var sensortag
 		var capturedData = {
 			magnetX: 0,
 			magnetY: 0,
 			magnetZ: 0
-			
+
 		}
 
 		var calibrateMeButton = document.getElementById("CalibrateMe")
 
-		
+
 		function initialiseSensorTag()
 		{
 			// Create SensorTag CC2650 instance.
 			sensortag = evothings.tisensortag.createInstance(
 			evothings.tisensortag.CC2650_BLUETOOTH_SMART)
-			
+
 			// Uncomment to use SensorTag CC2541.
 			//sensortag = evothings.tisensortag.createInstance(
 			//	evothings.tisensortag.CC2541_BLUETOOTH_SMART)
-			
+
 			//
 			// Here sensors are set up.
 			//
@@ -172,55 +172,39 @@
 			//.gyroscopeCallback(gyroscopeHandler, 1000)
 			.luxometerCallback(luxometerHandler, 1000)
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////THIS IS MY OWN COOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODE
 		var whatever = {
 			this: "thasef"
 		}
-		
+
 		function getNum(){
 			document.getElementById("customButton").innerHTML = whatever.this;
 		}
 		///////////////////////////////////////////////////////////////////////////////////////THIS IS MY OWN COOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODE
-		
+
 		function connect()
 		{
+			//this call returns before the tag is necessarily connected
 			sensortag.connectToNearestDevice()
-			
+
 			//TODO: validate that we connected to the correct tag
 			//This is not currently being implemented because we
-			//are assuming that we'll only be setting up one room 
+			//are assuming that we'll only be setting up one room
 			//at a time. (And we can't think of a good way to do it)
-			
+
 			//don't talk to the server unless we connected successfully
-			if ('CC2541' == sensortag.getDeviceModel()){
-				//get the room id
-				var roomNum = document.getElementById("roomNum").value;
-				//make sure they entered a room number
-				if(roomNum != ''){
-					//TODO: tell the server that we have a new tag
-					//var data = {"room_id": roomNum};
-					//$.post("http://roomteam.me/add_sensor/", JSON.stringify(data), null, "json");
-				} else {
-					//alert user that they need to enter a room num
-					displayValue('RoomStatus', "Unable to register: Please enter a room number.")
-				}
-				
-				//TODO: check response from server that it registered correctly?
-			} else {
-				//alert the user that it didn't work
-				displayValue('RoomStatus', "Connection to tag failed.")
-			}
+
 		}
-		
+
 		function disconnect()
 		{
 			sensortag.disconnectDevice()
 			resetSensorDisplayValues()
 		}
-		
+
 		var sensorsOn = true
-		
+
 		function toggleSensors()
 		{
 			if(sensorsOn)
@@ -248,9 +232,28 @@
 				sensorsOn = true
 			}
 		}
-		
+
 		function statusHandler(status)
 		{
+			//first time we connect, register with the server
+			if(status == 'CONNECTED' && sensortag.status != 'CONNECTED'){
+				console.log(status);
+					//get the room id
+					var roomNum = document.getElementById("roomNum").value;
+					//make sure they entered a room number
+					if(roomNum != ''){
+						//TODO: tell the server that we have a new tag
+						//var data = {"room_id": roomNum};
+						//$.post("http://roomteam.me/add_sensor/", JSON.stringify(data), null, "json");
+					} else {
+						//alert user that they need to enter a room num
+						displayValue('RoomStatus', "Unable to register: Please enter a room number.")
+					}
+
+					//TODO: check response from server that it registered correctly?
+
+			}
+			sensortag.status = status;
 			if ('DEVICE_INFO_AVAILABLE' == status)
 			{
 				// Show a notification about that the firmware should be
@@ -267,25 +270,25 @@
 				{
 					upgradeNotice.classList.add('hidden')
 				}
-				
+
 				// Show device model and firmware version.
 				displayValue('DeviceModel', sensortag.getDeviceModel())
 				displayValue('FirmwareData', sensortag.getFirmwareString())
-				
+
 				// Show which sensors are not supported by the connected SensorTag.
 				if (!sensortag.isLuxometerAvailable())
 				{
 					document.getElementById('Luxometer').style.display = 'none'
 				}
 			}
-			
+
 			displayValue('StatusData', status)
 		}
-		
+
 		function errorHandler(error)
 		{
 			console.log('Error: ' + error)
-			
+
 			if (evothings.easyble.error.DISCONNECTED == error)
 			{
 				resetSensorDisplayValues()
@@ -295,7 +298,7 @@
 				displayValue('StatusData', 'Error: ' + error)
 			}
 		}
-		
+
 		function resetSensorDisplayValues()
 		{
 			// Clear current values.
@@ -311,11 +314,11 @@
 			//displayValue('BarometerData', blank)
 			//displayValue('GyroscopeData', blank)
 			displayValue('LuxometerData', blank)
-			
+
 			// Reset screen color.
 			setBackgroundColor('white')
 		}
-		
+
 		function keypressHandler(data)
 		{
 			// Update background color.
@@ -334,12 +337,12 @@
 				setBackgroundColor('magenta')
 				break;
 			}
-			
+
 			// Update the value displayed.
 			var string = 'raw: 0x' + bufferToHexStr(data, 0, 1)
 			displayValue('KeypressData', string)
 		}
-		
+
 		function temperatureHandler(data)
 		{
 			// Calculate temperature from raw sensor data.
@@ -348,7 +351,7 @@
 			var af = sensortag.celsiusToFahrenheit(ac)
 			var tc = values.targetTemperature
 			var tf = sensortag.celsiusToFahrenheit(tc)
-			
+
 			// Prepare the information to display.
 			var string =
 			//'raw: <span style="font-family: monospace;">0x' +
@@ -358,11 +361,11 @@
 			(ac >= 0 ? '+' : '') + ac.toFixed(2) + '&deg; C ' +
 			'(' + (af >= 0 ? '+' : '') + af.toFixed(2) + '&deg; F) [amb]' +
 			'<br/>'
-			
+
 			// Update the value displayed.
 			displayValue('TemperatureData', string)
 		}
-		
+
 		function accelerometerHandler(data)
 		{
 			// Calculate the x,y,z accelerometer values from raw data.
@@ -370,10 +373,10 @@
 			var x = values.x
 			var y = values.y
 			var z = values.z
-			
+
 			//var model = sensortag.getDeviceModel()
 			//var dataOffset = (model == 2 ? 6 : 0)
-			
+
 			// Prepare the information to display.
 			string =
 			//'raw: <span style="font-family: monospace;">0x' +
@@ -381,23 +384,23 @@
 			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + 'G<br/>' +
 			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + 'G<br/>' +
 			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + 'G<br/>'
-			
+
 			// Update the value displayed.
 			displayValue('AccelerometerData', string)
 		}
-		
+
 		function humidityHandler(data)
 		{
 			// Calculate the humidity values from raw data.
 			var values = sensortag.getHumidityValues(data)
-			
+
 			// Calculate the humidity temperature (C and F).
 			var tc = values.humidityTemperature
 			var tf = sensortag.celsiusToFahrenheit(tc)
-			
+
 			// Calculate the relative humidity.
 			var h = values.relativeHumidity
-			
+
 			// Prepare the information to display.
 			string =
 			//'raw: <span style="font-family: monospace;">0x' +
@@ -405,7 +408,7 @@
 			(tc >= 0 ? '+' : '') + tc.toFixed(2) + '&deg; C ' +
 			'(' + (tf >= 0 ? '+' : '') + tf.toFixed(2) + '&deg; F)' + '<br/>' +
 			(h >= 0 ? '+' : '') + h.toFixed(2) + '% RH' + '<br/>'
-			
+
 			// Update the value displayed.
 			displayValue('HumidityData', string)
 		}
@@ -439,10 +442,10 @@
 			var x = values.x
 			var y = values.y
 			var z = values.z
-			
+
 			//var model = sensortag.getDeviceModel()
 			//var dataOffset = (model == 2 ? 12 : 0)
-			
+
 			// Prepare the information to display.
 			string =
 			//'raw: <span style="font-family: monospace;">0x' +
@@ -456,7 +459,7 @@
 			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '&micro;T <br/>(' + sensortag.magClosedZ + ', ' +
 			sensortag.magHalfZ + ', ' +
 			sensortag.magOpenZ + ')<br/>'
-			
+
 			var distClosed = Math.abs(x - sensortag.magClosedX) + Math.abs(y - sensortag.magClosedY) + Math.abs(z - sensortag.magClosedZ);
 			var distHalf = Math.abs(x - sensortag.magHalfX) + Math.abs(y - sensortag.magHalfY) + Math.abs(z - sensortag.magHalfZ);
 			var distOpen = Math.abs(x - sensortag.magOpenX) + Math.abs(y - sensortag.magOpenY) + Math.abs(z - sensortag.magOpenZ);
@@ -474,14 +477,14 @@
 				sensortag.doorStatus = 1;
 				string += 'We are not sure';
 			}
-			
+
 			// Update the value displayed.
 			displayValue('MagnetometerData', string)
-			
+
 			//this is just here because it needs to be called regularly
 			updateRoomStatus();
 		}
-		
+
 		function calibrateClosed(){
 			setCalibratingProperty("calibratingClosed")
 			var values = sensortag.lastMagData;
@@ -492,7 +495,7 @@
 			sensortag.magClosedY = y
 			sensortag.magClosedZ = z
 		}
-		
+
 		function calibrateOpen(){
 			var values = sensortag.lastMagData
 			var x = values.x
@@ -504,7 +507,7 @@
 			calibratingDoorOpen = true;
 			setCalibratingProperty("calibratingOpen")
 		}
-		
+
 		function calibrateHalf(){
 			var values = sensortag.lastMagData
 			var x = values.x
@@ -515,23 +518,23 @@
 			sensortag.magHalfZ = z
 			setCalibratingProperty("calibratingHalf")
 		}
-		
+
 		function barometerHandler(data)
 		{
 			// Calculate pressure from raw sensor data.
 			var values = sensortag.getBarometerValues(data)
 			var pressure = values.pressure
-			
+
 			// Prepare the information to display.
 			string =
 			//'raw: <span style="font-family: monospace;">0x' +
 			//	bufferToHexStr(data, 0, 4) + '</span><br/>' +
 			'Pressure: ' + pressure.toPrecision(5) + ' mbar<br/>'
-			
+
 			// Update the value displayed.
 			displayValue('BarometerData', string)
 		}
-		
+
 		function gyroscopeHandler(data)
 		{
 			// Calculate the gyroscope values from raw sensor data.
@@ -539,7 +542,7 @@
 			var x = values.x
 			var y = values.y
 			var z = values.z
-			
+
 			// Prepare the information to display.
 			string =
 			//'raw: <span style="font-family: monospace;">0x' +
@@ -547,22 +550,22 @@
 			'x: ' + (x >= 0 ? '+' : '') + x.toFixed(5) + '<br/>' +
 			'y: ' + (y >= 0 ? '+' : '') + y.toFixed(5) + '<br/>' +
 			'z: ' + (z >= 0 ? '+' : '') + z.toFixed(5) + '<br/>'
-			
+
 			// Update the value displayed.
 			displayValue('GyroscopeData', string)
-			
+
 		}
-		
+
 		function luxometerHandler(data)
 		{
 			var value = sensortag.getLuxometerValue(data)
-			
+
 			// Prepare the information to display.
 			string = ''
 			//'raw: <span style="font-family: monospace;">0x' +
 			//	bufferToHexStr(data, 0, 2) + '</span><br/>' +
 			'Light level: ' + value.toPrecision(5) + ' lux<br/>'
-			
+
 			if(value < 5){
 				sensortag.lightStatus = 5;	//statuses are probablity (or score) that the room is empty
 				string = 'Lights off'
@@ -576,24 +579,24 @@
 				sensortag.lightStatus = 1;
 				string = 'Lights on'
 			}
-			
+
 			string += ' (' + value.toPrecision(5) + ' lux)<br/>'
-			
+
 			// Update the value displayed.
 			displayValue('LuxometerData', string)
 		}
-		
+
 		function displayValue(elementId, value)
 		{
 			document.getElementById(elementId).innerHTML = value
 		}
-		
+
 		function setBackgroundColor(color)
 		{
 			document.documentElement.style.background = color
 			document.body.style.background = color
 		}
-		
+
 		/**
 		 * Convert byte buffer to hex string.
 		 * @param buffer - an Uint8Array
@@ -610,7 +613,7 @@
 				}
 				return hex
 			}
-			
+
 			/**
 			 * Convert byte number to hex string.
 			 */
@@ -625,18 +628,18 @@
 					}
 					return hex
 				}
-				
+
 				document.addEventListener(
 				'deviceready',
 				function() { evothings.scriptsLoaded(initialiseSensorTag) },
 				false)
-				
+
 		function updateRoomStatus(){
 			var score = sensortag.lightStatus + sensortag.doorStatus;
-			
+
 			var statusString = 'Room is ';
 			var roomStatus = '';
-			
+
 			if(score > 7){
 				roomStatus += 'empty';
 			} else if (score > 3){
@@ -644,24 +647,24 @@
 			} else {
 				roomStatus += 'occupied';
 			}
-			
-			
+
+
 			statusString += roomStatus + ' (' + score + ')';
-			
+
 			displayValue("RoomStatus", statusString);
-			
+
 			//push to server (only if status has changed)
 			//if(sensortag.roomStatus != roomStatus){
 			//	//push to server (TODO: this hasn't been tested yet)
 			//	var data = {"status": roomStatus};
 			//	$.post("http://roomteam.me/room_status/", JSON.stringify(data), null, "json");
-			//	
+			//
 			//	//update current status
 			//	sensortag.roomStatus = roomStatus;
 			//}
 		}
 	</script>
-	
+
 </body>
 
 </html>
