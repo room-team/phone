@@ -506,14 +506,22 @@
 		}
 
 		function hideButtons() {
+			var none = 'none';
 			var closedButton = document.getElementById('calibrateClosed');
 			var openButton = document.getElementById('calibrateOpen');
 			var halfButton = document.getElementById('calibrateHalf');
+			var lightOffButton = document.getElementById('calibrateLightOff');
+			var lightOnButton = document.getElementById('calibrateLightOn');
+			var lightDimButton = document.getElementById('calibrateLightDim');
+			var projectorDimButton = document.getElementById('calibrateProjectorDim');
 
-			closedButton.hide();
-			openButton.hide();
-			halfButton.hide();
-
+			closedButton.style.display = none;
+			openButton.style.display = none;
+			halfButton.style.display = none;
+			lightOffButton.style.display = none;
+			lightOnButton.style.display = none;
+			lightDimButton.style.display = none;
+			projectorDimButton.style.display = none;
 		}
 		
 		function calibrateClosed(){
