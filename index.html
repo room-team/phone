@@ -63,16 +63,30 @@
 			Calibrate Me
 		</button>
 
-		<button id="calibrateClosed" hidden="calibratingBools.calibratingDoorClosed" onclick="calibrateClosed()"
+		<button id="calibrateClosed" hidden="" onclick="calibrateClosed()"
 				class="charcoal">
-			Calibrate Closed
+			Calibrate Door Closed
 		</button>
-		<button onclick="calibrateOpen()" class="charcoal">
-			Calibrate Open
+		<button id="calibrateOpen" onclick="calibrateOpen()" class="charcoal">
+			Calibrate Door Open
 		</button>
-		<button onclick="calibrateHalf()" class="charcoal">
-			Calibrate Halfway Open
-		</button></br>
+		<button id="calibrateHalf" onclick="calibrateHalf()" class="charcoal">
+			Calibrate Door Halfway Open
+		</button>
+		<button id="calibrateLightOff">
+			Calibrate Light Off
+		</button>
+		<button id="calibrateLightOn">
+			Calibrate Light On
+		</button>
+		<button id="calibrateLightDim">
+			Calibrate Light Dim
+		</button>
+		<button id="calibrateProjectorDim">
+			Calibrate Projector Dim
+		</button>
+		</br>
+
 		<strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
 	</span>
 
@@ -491,8 +505,21 @@
 			updateRoomStatus();
 		}
 
+		function hideButtons() {
+			var closedButton = document.getElementById('calibrateClosed');
+			var openButton = document.getElementById('calibrateOpen');
+			var halfButton = document.getElementById('calibrateHalf');
+
+			closedButton.hide();
+			openButton.hide();
+			halfButton.hide();
+
+		}
+		
 		function calibrateClosed(){
 			setCalibratingProperty("calibratingClosed")
+			hideButtons()
+
 			var values = sensortag.lastMagData;
 			var x = values.x
 			var y = values.y
