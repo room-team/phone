@@ -63,10 +63,25 @@
 			Calibrate Me
 		</button>
 
+		</br><strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
+
 		<button id="calibrateClosed" hidden="" onclick="calibrateClosed()"
 				class="charcoal">
 			Calibrate Door Closed
 		</button>
+
+		<div>
+			<button id="saveClosedDoorValues">
+				Calibrate
+			</button>
+			<span id="LuxometerData">
+				Light:
+			</span>
+			<span id="MagnetometerData">
+				Direction:
+			</span>
+		</div>
+
 		<button id="calibrateOpen" onclick="calibrateOpen()" class="charcoal">
 			Calibrate Door Open
 		</button>
@@ -87,7 +102,6 @@
 		</button>
 		</br>
 
-		<strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
 	</span>
 
 	<p>
@@ -153,11 +167,18 @@
 		var capturedData = {
 			magnetX: 0,
 			magnetY: 0,
-			magnetZ: 0
-
+			magnetZ: 0,
+			lux: 0
 		}
 
 		var calibrateMeButton = document.getElementById("CalibrateMe")
+		var closedButton = document.getElementById('calibrateClosed');
+		var openButton = document.getElementById('calibrateOpen');
+		var halfButton = document.getElementById('calibrateHalf');
+		var lightOffButton = document.getElementById('calibrateLightOff');
+		var lightOnButton = document.getElementById('calibrateLightOn');
+		var lightDimButton = document.getElementById('calibrateLightDim');
+		var projectorDimButton = document.getElementById('calibrateProjectorDim');
 
 
 		function initialiseSensorTag()
@@ -507,13 +528,6 @@
 
 		function hideButtons() {
 			var none = 'none';
-			var closedButton = document.getElementById('calibrateClosed');
-			var openButton = document.getElementById('calibrateOpen');
-			var halfButton = document.getElementById('calibrateHalf');
-			var lightOffButton = document.getElementById('calibrateLightOff');
-			var lightOnButton = document.getElementById('calibrateLightOn');
-			var lightDimButton = document.getElementById('calibrateLightDim');
-			var projectorDimButton = document.getElementById('calibrateProjectorDim');
 
 			closedButton.style.display = none;
 			openButton.style.display = none;
@@ -524,18 +538,29 @@
 			projectorDimButton.style.display = none;
 		}
 		
-		function calibrateClosed(){
+		function initCalibrateClosed(){
 			setCalibratingProperty("calibratingClosed")
 			hideButtons()
+			//Unhide calibrate closed div
 
+		}
+
+		function calibrateClosed() {
 			var values = sensortag.lastMagData;
 			var x = values.x
 			var y = values.y
 			var z = values.z
+
+			//Should probably also add to capturedData object?
 			sensortag.magClosedX = x
 			sensortag.magClosedY = y
 			sensortag.magClosedZ = z
+
+			//Get data from LuxometerData html element
+			capturedData.lux = document.getElementById('LuxometerData').value;
 		}
+
+
 
 		function calibrateOpen(){
 			var values = sensortag.lastMagData
