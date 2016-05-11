@@ -350,7 +350,6 @@ button.clear {
 	margin-left: 1%;
 	background-color: #e15a64; /* Default color: "Soft Red". */
 }
-
 button,
 input.btn-group + label,
 .button {
@@ -358,12 +357,13 @@ input.btn-group + label,
 	box-sizing: border-box; /* Width & height includes padding & border. */
 
 	font-family: 'Proxima Nova Black';
-	font-size: inherit;
+	font-size: .5em;
 	line-height: 100%;
 	text-align: center;
 	text-transform: uppercase;
-
+	display: inline-block;
 	color: #fff;
+	width: 48%;
 
 	margin: 0.5em 0 0.5em 0;
 	padding: 9px 13px 8px 13px;
