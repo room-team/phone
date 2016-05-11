@@ -38,18 +38,18 @@
 		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
 	</header>
 
-	<h1>Team Room Availablity Tracker</h1>
+	<h1 style="float:left;width:50%">Team Room Availablity Tracker</h1>
 
-	<img src="TISensorTagCC2650.png"
-		style="float:right;width:120px;height:auto;"/>
+	<img src="TISensorTagCC2650.png" style="width:100px;height:auto;position:absolute;top:60px;right:40px"/>
 
 	<!-- DO NOT DELETE -->
 	<p id="upgradeNotice" class="hidden">		
  		<span class="color_softred">Please upgrade the firmware of your SensorTag.</span>		
  	</p>
 	<!-- DO NOT DELETE -->
-		
-	Room Number: <textarea id="roomNum" rows="1" cols="5" maxlength="4"></textarea>
+	<br><br><br><br>
+	<span style="display:block;">Room Number: <textarea style="width:25%;" id="roomNum" rows="1" cols="5" maxlength="4"></textarea></span>
+
 
 	<button onclick="connect()" class="green">
 		Connect
@@ -58,47 +58,25 @@
 	<button onclick="disconnect()" class="charcoal">
 		Disconnect
 	</button>
+	</br><strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
 	<span>
-		<button id="CalibrateMe" class="charcoal">
-			Calibrate Me
-		</button>
+		</br>
 
-		</br><strong>Tag Status:</strong> <span id="StatusData">Press Connect to find the nearest SensorTag</span>
+		<button id="calibrateOpen" onclick="calibrateOpen()" class="charcoal">
+			Calibrate Door Open
+		</button>
 
 		<button id="calibrateClosed" hidden="" onclick="calibrateClosed()"
 				class="charcoal">
 			Calibrate Door Closed
 		</button>
 
-		<div>
-			<button id="saveClosedDoorValues">
-				Calibrate
-			</button>
-			<span id="LuxometerData">
-				Light:
-			</span>
-			<span id="MagnetometerData">
-				Direction:
-			</span>
-		</div>
-
-		<button id="calibrateOpen" onclick="calibrateOpen()" class="charcoal">
-			Calibrate Door Open
-		</button>
 		<button id="calibrateHalf" onclick="calibrateHalf()" class="charcoal">
 			Calibrate Door Halfway Open
 		</button>
-		<button id="calibrateLightOff">
-			Calibrate Light Off
-		</button>
-		<button id="calibrateLightOn">
-			Calibrate Light On
-		</button>
-		<button id="calibrateLightDim">
-			Calibrate Light Dim
-		</button>
-		<button id="calibrateProjectorDim">
-			Calibrate Projector Dim
+
+		<button id="ResetButtonVisibility" class="charcoal" onclick="resetButtonVisibility()">
+			Recalibrate Sensors
 		</button>
 		</br>
 
@@ -107,7 +85,7 @@
 	<p>
 		<strong>Room Status:</strong> <span id="RoomStatus">No tag connected yet</span>
 	<p>
-		<button onclick="toggleSensors()" class="charcoal">Toggle sensors</button>
+		<button onclick="toggleSensors()" style="font-size: .8em;width:100%" class="charcoal">Toggle sensors</button>
 	</p>
 
 	<!--<h2>Keypress:</h2>
@@ -115,7 +93,7 @@
 		<span id="KeypressData">[Waiting for value]</span>
 	</p>-->
 
-
+<span id="bottomSensorData">
 	<h2>Temperature:</h2>
 	<p>
 		<span id="TemperatureData">[Waiting for value]</span>
@@ -153,13 +131,11 @@
 			<span id="LuxometerData">[Waiting for value]</span>
 		</p>
 	</div>
-
-	<h2>Device info:</h2>
-	<p>
+</span>
+	<p style="display:none;">
 		SensorTag device model: <span id="DeviceModel">?</span><br />
 		Firmware version: <span id="FirmwareData">?</span>
 	</p>
-
 	<script>
 
 		// SensorTag object.
@@ -171,14 +147,10 @@
 			lux: 0
 		}
 
-		var calibrateMeButton = document.getElementById("CalibrateMe")
 		var closedButton = document.getElementById('calibrateClosed');
 		var openButton = document.getElementById('calibrateOpen');
 		var halfButton = document.getElementById('calibrateHalf');
-		var lightOffButton = document.getElementById('calibrateLightOff');
-		var lightOnButton = document.getElementById('calibrateLightOn');
-		var lightDimButton = document.getElementById('calibrateLightDim');
-		var projectorDimButton = document.getElementById('calibrateProjectorDim');
+		var bottomSensorData = document.getElementById('bottomSensorData')
 
 
 		function initialiseSensorTag()
@@ -212,17 +184,20 @@
 			.magnetometerCallback(magnetometerHandler, 1000)
 			//.gyroscopeCallback(gyroscopeHandler, 1000)
 			.luxometerCallback(luxometerHandler, 1000)
-		}
 
-		///////////////////////////////////////////////////////////////////////////////////////THIS IS MY OWN COOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODE
-		var whatever = {
-			this: "thasef"
-		}
 
-		function getNum(){
-			document.getElementById("customButton").innerHTML = whatever.this;
+
+			//This hides sensor data when the device is first paired
+			// Becomes visible with first calibration
+			bottomSensorData.style.display = 'none';
 		}
-		///////////////////////////////////////////////////////////////////////////////////////THIS IS MY OWN COOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOODE
+		function resetButtonVisibility(){
+
+			closedButton.style.display = 'inline-block';
+			openButton.style.display = 'inline-block';
+			halfButton.style.display = 'inline-block';
+			bottomSensorData.style.display = 'none';
+		}
 
 		function connect()
 		{
@@ -454,27 +429,6 @@
 			displayValue('HumidityData', string)
 		}
 
-		calibratingBools = {
-			calibratingDoorClosed: false,
-			calibratingDoorHalf: false,
-			calibratingDoorOpen: false,
-			calibratingLightOff: false,
-			calibratingLightOn: false,
-			calibratingLightDim: false,
-			calibratingProjectorOn: false
-		};
-
-		function setCalibratingProperty(property) {
-			for (prop in Object.keys(calibratingBools)) {
-				if (prop === property) {
-					calibratingBools[prop] = true;
-				} else {
-					calibratingBools[prop] = false;
-				}
-			}
-		}
-
-
 		function magnetometerHandler(data)
 		{
 			// Calculate the magnetometer values from raw sensor data.
@@ -526,25 +480,6 @@
 			updateRoomStatus();
 		}
 
-		function hideButtons() {
-			var none = 'none';
-
-			closedButton.style.display = none;
-			openButton.style.display = none;
-			halfButton.style.display = none;
-			lightOffButton.style.display = none;
-			lightOnButton.style.display = none;
-			lightDimButton.style.display = none;
-			projectorDimButton.style.display = none;
-		}
-		
-		function initCalibrateClosed(){
-			setCalibratingProperty("calibratingClosed")
-			hideButtons()
-			//Unhide calibrate closed div
-
-		}
-
 		function calibrateClosed() {
 			var values = sensortag.lastMagData;
 			var x = values.x
@@ -558,9 +493,10 @@
 
 			//Get data from LuxometerData html element
 			capturedData.lux = document.getElementById('LuxometerData').value;
+
+			closedButton.style.display = 'none';
+			bottomSensorData.style.display = 'block';
 		}
-
-
 
 		function calibrateOpen(){
 			var values = sensortag.lastMagData
@@ -571,7 +507,10 @@
 			sensortag.magOpenY = y
 			sensortag.magOpenZ = z
 			calibratingDoorOpen = true;
-			setCalibratingProperty("calibratingOpen")
+
+			capturedData.lux = document.getElementById('LuxometerData').value;
+			openButton.style.display = 'none';
+			bottomSensorData.style.display = 'block';
 		}
 
 		function calibrateHalf(){
@@ -582,7 +521,10 @@
 			sensortag.magHalfX = x
 			sensortag.magHalfY = y
 			sensortag.magHalfZ = z
-			setCalibratingProperty("calibratingHalf")
+
+			capturedData.lux = document.getElementById('LuxometerData').value;
+			halfButton.style.display = 'none';
+			bottomSensorData.style.display = 'block';
 		}
 
 		function barometerHandler(data)
@@ -708,7 +650,7 @@
 
 			if(score > 7){
 				roomStatus += 'empty';
-			} else if (score > 3){
+			} else if (score > 4){
 				roomStatus += 'unsure';
 			} else {
 				roomStatus += 'occupied';
